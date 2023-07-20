@@ -48,31 +48,32 @@ class AutoGPTPrompt(BaseChatPromptTemplate, BaseModel):
         )
         memory: VectorStoreRetriever = kwargs["memory"]
         previous_messages = kwargs["messages"]
-        relevant_docs = memory.get_relevant_documents(str(previous_messages[-10:]))
-        relevant_memory = [d.page_content for d in relevant_docs]
-        relevant_memory_tokens = sum(
-            [self.token_counter(doc) for doc in relevant_memory]
-        )
-        while used_tokens + relevant_memory_tokens > 2500:
-            relevant_memory = relevant_memory[:-1]
-            relevant_memory_tokens = sum(
-                [self.token_counter(doc) for doc in relevant_memory]
-            )
-        content_format = (
-            f"This reminds you of these events "
-            f"from your past:\n{relevant_memory}\n\n"
-        )
-        memory_message = SystemMessage(content=content_format)
-        used_tokens += self.token_counter(memory_message.content)
+        # relevant_docs = memory.get_relevant_documents(str(previous_messages[-10:]))
+        # relevant_memory = [d.page_content for d in relevant_docs]
+        # relevant_memory_tokens = sum(
+        #     [self.token_counter(doc) for doc in relevant_memory]
+        # )
+        # while used_tokens + relevant_memory_tokens > 2500:
+        #     relevant_memory = relevant_memory[:-1]
+        #     relevant_memory_tokens = sum(
+        #         [self.token_counter(doc) for doc in relevant_memory]
+        #     )
+        # content_format = (
+        #     f"This reminds you of these events "
+        #     f"from your past:\n{relevant_memory}\n\n"
+        # )
+        # memory_message = SystemMessage(content=content_format)
+        # used_tokens += self.token_counter(memory_message.content)
         historical_messages: List[BaseMessage] = []
-        for message in previous_messages[-10:][::-1]:
+        for message in previous_messages[-25:][::-1]:
             message_tokens = self.token_counter(message.content)
             if used_tokens + message_tokens > self.send_token_limit - 1000:
                 break
             historical_messages = [message] + historical_messages
             used_tokens += message_tokens
         input_message = HumanMessage(content=kwargs["user_input"])
-        messages: List[BaseMessage] = [base_prompt, time_prompt, memory_message]
+        # messages: List[BaseMessage] = [base_prompt, time_prompt, memory_message]
+        messages: List[BaseMessage] = [base_prompt, time_prompt]
         messages += historical_messages
         messages.append(input_message)
         return messages

@@ -26,9 +26,9 @@ class PromptGenerator:
             "thoughts": {
                 "text": "thought",
                 "reasoning": "reasoning",
+                "speak": "thoughts summary to say to user in a short-non technical way. afterwards, write your plan and criticism",
                 "plan": "- short bulleted\n- list that conveys\n- long-term plan",
                 "criticism": "constructive self-criticism",
-                "speak": "thoughts summary to say to user",
             },
             "command": {"name": "command name", "args": {"arg name": "value"}},
         }
@@ -178,6 +178,12 @@ def get_prompt(tools: List[BaseTool]) -> str:
     prompt_generator.add_performance_evaluation(
         "Every command has a cost, so be smart and efficient. "
         "Aim to complete tasks in the least number of steps."
+    )
+    prompt_generator.add_performance_evaluation(
+        "Make sure to speak in a friendly summary manner."
+    )
+    prompt_generator.add_performance_evaluation(
+        "Don't include the specific questions in the speak field"
     )
 
     # Generate the prompt string
